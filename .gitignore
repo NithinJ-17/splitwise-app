@@ -49,7 +49,7 @@ Thumbs.db
 
 # local env files
 .env*.local
-
+config.py
 # vercel
 .vercel
 
