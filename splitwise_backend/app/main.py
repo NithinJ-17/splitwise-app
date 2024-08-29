@@ -1,9 +1,11 @@
 import logging
+import uuid
 from fastapi import FastAPI, Header, HTTPException, Depends
 from app.routers import expenses, balances, users, settlements, groups  
 from app.database.connection import db
-from app.utils import verify_password, hash_password  # Import hash_password
+from app.utils import verify_password, hash_password
 from app.state import TOKENS
+from fastapi.middleware.cors import CORSMiddleware
 
 # Configure logging
 logging.basicConfig(
@@ -16,6 +18,13 @@ logging.basicConfig(
 )
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],  # Adjust this to your frontend URL
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all methods (GET, POST, etc.)
+    allow_headers=["*"],  # Allow all headers
+)
 
 # Include routers
 app.include_router(users.router)
@@ -24,21 +33,26 @@ app.include_router(balances.router)
 app.include_router(settlements.router)
 app.include_router(groups.router)
 
+async def generate_readable_name(index):
+    # Generate a readable username like "User1", "User2", etc.
+    return f"User{index}"
+
+async def generate_password():
+    # Generate a simple password or use a more complex generator
+    return str(uuid.uuid4())[:8]  # Shortened UUID as a simple password example
+
 async def seed_users():
-    users = [
-        {"user_id": "user1", "name": "Alice", "password": "password1"},
-        {"user_id": "user2", "name": "Bob", "password": "password2"},
-        {"user_id": "user3", "name": "Charlie", "password": "password3"},
-        {"user_id": "user4", "name": "David", "password": "password4"},
-        {"user_id": "user5", "name": "Eve", "password": "password5"},
-    ]
+    users = []
+    for i in range(1, 6):  # Creating 5 users
+        user_id = str(uuid.uuid4())  # Generate a unique user_id
+        name = await generate_readable_name(i)
+        password = hash_password(await generate_password())  # Hash the generated password
+        users.append({"user_id": user_id, "name": name, "password": password})
+    
     existing_users = await db.users.count_documents({})
-    if existing_users == 0:
-        # Hash passwords before inserting
-        for user in users:
-            user["password"] = hash_password(user["password"])
+    if existing_users < 5:
         await db.users.insert_many(users)
-        logging.info("Initial users seeded into the database with hashed passwords.")
+        logging.info("Initial users seeded into the database with generated user IDs, names, and hashed passwords.")
 
 @app.on_event("startup")
 async def startup_event():

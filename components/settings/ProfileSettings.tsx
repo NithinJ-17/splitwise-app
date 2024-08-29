@@ -1,5 +1,6 @@
 // components/settings/ProfileSettings.tsx
 import { FC, useState } from 'react';
+import Button from '../Button';
 
 const ProfileSettings: FC = () => {
     const [username, setUsername] = useState<string>('');
@@ -18,7 +19,7 @@ const ProfileSettings: FC = () => {
                     type="text"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    className="mt-1 p-2 border border-gray-300 rounded-md w-full"
+                    className="bg-gray-900 mt-1 p-2 border border-gray-300 rounded-md w-full"
                 />
             </div>
             <div className="mt-4">
@@ -27,12 +28,12 @@ const ProfileSettings: FC = () => {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="mt-1 p-2 border border-gray-300 rounded-md w-full"
+                    className="bg-gray-900 mb-2 mt-1 p-2 border border-gray-300 rounded-md w-full"
                 />
             </div>
-            <button onClick={handleSave} className="mt-4 bg-blue-600 text-white py-2 px-4 rounded">
+            <Button onClick={handleSave}>
                 Save
-            </button>
+            </Button>
         </div>
     );
 };

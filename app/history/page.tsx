@@ -1,5 +1,5 @@
-// app/history/page.tsx
-"use client"
+"use client";
+import ProtectedRoute from '../../components/ProtectedRoute';
 import TransactionHistory from '../../components/history/TransactionHistory';
 
 const HistoryPage = () => {
@@ -11,10 +11,12 @@ const HistoryPage = () => {
     ];
 
     return (
-        <div>
-            <h1 className="text-2xl font-bold mb-4">Transaction History</h1>
-            <TransactionHistory transactions={transactions} />
-        </div>
+        <ProtectedRoute>
+            <div>
+                <h1 className="text-2xl font-bold mb-4">Transaction History</h1>
+                <TransactionHistory transactions={transactions} />
+            </div>
+        </ProtectedRoute>
     );
 };
 

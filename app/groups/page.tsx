@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import GroupList from '../../components/groups/GroupList';
 import GroupDetails from '../../components/groups/GroupDetails';
+import ProtectedRoute from '../../components/ProtectedRoute';
 
 const GroupsPage = () => {
     const [selectedGroupId, setSelectedGroupId] = useState<number | null>(null);
@@ -19,6 +20,7 @@ const GroupsPage = () => {
     };
 
     return (
+        <ProtectedRoute>
         <div>
             <h1 className="text-2xl font-bold mb-4">Groups</h1>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -39,6 +41,7 @@ const GroupsPage = () => {
                 </div>
             </div>
         </div>
+        </ProtectedRoute>
     );
 };
 

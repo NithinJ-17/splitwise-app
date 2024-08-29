@@ -1,8 +1,10 @@
 // app/expenses/page.tsx
 import ExpenseForm from '../../components/expenses/ExpenseForm';
+import ProtectedRoute from '../../components/ProtectedRoute';
 
 const ExpensesPage = () => {
     return (
+        <ProtectedRoute>
         <div>
             <h1 className="text-2xl font-bold mb-4">Expenses</h1>
             <ExpenseForm />
@@ -15,6 +17,7 @@ const ExpensesPage = () => {
                 </div>
             </div>
         </div>
+        </ProtectedRoute>
     );
 };
 

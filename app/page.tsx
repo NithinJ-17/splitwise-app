@@ -1,35 +1,31 @@
-// app/page.tsx
-import CurrencySlideshow from '../components/CurrencySlideshow';
-import Header from '../components/Header';
+import Link from 'next/link';
 
-const HomePage = () => {
+const GuestPage = () => {
     return (
-        <div className="text-white min-h-screen" style={{ backgroundColor: 'transparent' }}>
-            <main className="container mx-auto px-4 py-8">
-                <section className="text-center mb-16">
-                    <h1 className="text-6xl font-bold mb-6 shadow-xl">Welcome to Setu splitXchange</h1>
-                    <p className="text-2xl shadow-xl">Your one-stop solution for managing expenses with fiat and crypto.</p>
+        <div className="min-h-screen  p-8 rounded-lg shadow-2xl text-white p-8">
+            <header className="text-center mb-12">
+                <h1 className="text-5xl font-bold mb-4">Welcome to Setu splitXchange</h1>
+                <p className="text-xl mb-4">Your premier platform for managing expenses with both fiat and cryptocurrencies.</p>
+            </header>
+            <main>
+                <section className=" bg-gray-900 mb-12 rounded p-4">
+                    <h2 className="text-3xl font-bold mb-4">Features</h2>
+                    <ul className="list-disc pl-5">
+                        <li className="mb-2">Manage both fiat and cryptocurrency expenses.</li>
+                        <li className="mb-2">Track balances and transactions with ease.</li>
+                        <li className="mb-2">Create and manage groups for shared expenses.</li>
+                        <li className="mb-2">Enjoy real-time currency conversion updates.</li>
+                    </ul>
                 </section>
-                <section className="mb-12">
-                    <h2 className="text-4xl font-bold mb-6 shadow-xl">Overview</h2>
-                    <div className="bg-gray-900 p-8 rounded-lg shadow-2xl">
-                        {/* Placeholder for Balance Overview */}
-                        <p className="text-lg">Total Balance: $1500</p>
-                        <p className="text-lg">Fiat Balance: $1000</p>
-                        <p className="text-lg">Crypto Balance: 0.5 BTC</p>
-                    </div>
-                </section>
-                <section className="mb-12">
-                    <h2 className="text-4xl font-bold mb-6 shadow-xl">Recent Transactions</h2>
-                    <div className="bg-gray-900 p-8 rounded-lg shadow-2xl">
-                        {/* Placeholder for Recent Transactions */}
-                        <p className="text-lg">No recent transactions available.</p>
-                    </div>
+                <section className=" bg-gray-900 rounded p-4">
+                    <h2 className="text-3xl font-bold mb-4">How It Works</h2>
+                    <p className="mb-4">Setu splitXchange helps you manage your finances by keeping track of your expenses and balances in both traditional and digital currencies. With our intuitive interface, you can easily add, track, and settle expenses with your friends, family, or within groups.</p>
                 </section>
             </main>
         </div>
     );
 };
 
-export default HomePage;
+export default GuestPage;
+
 
