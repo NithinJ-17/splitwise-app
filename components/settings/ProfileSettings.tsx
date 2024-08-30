@@ -11,7 +11,7 @@ const ProfileSettings: FC = () => {
     };
 
     return (
-        <div className="bg-gray-900 p-8 rounded-lg shadow-2xl">
+        <div className="m-4 bg-opacity-50 backdrop-blur-md bg-gray-900 p-8 rounded-lg shadow-2xl">
             <h2 className="text-xl font-bold">Profile Settings</h2>
             <div className="mt-4">
                 <label className="block text-sm font-medium text-white-700">Username</label>

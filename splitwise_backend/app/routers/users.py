@@ -137,6 +137,9 @@ async def get_user_id_by_email(email: str):
 
         logging.info(f"User ID {user['user_id']} retrieved successfully for email {email}.")
         return {"user_id": user["user_id"]}
+    except HTTPException as http_exc:
+        # Re-raise the HTTPException to be handled by FastAPI's exception handler
+        raise http_exc
     except Exception as e:
         logging.error(f"Error retrieving user ID for email {email}: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")

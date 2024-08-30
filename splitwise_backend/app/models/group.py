@@ -10,7 +10,6 @@ class GroupExpense(BaseModel):
     split_between: Dict[str, float]  # { "user_id": amount_owed }
 
 class Group(BaseModel):
-    group_id: str
     name: str
     members: List[str]  # List of user_ids
     expenses: List[GroupExpense] = []  # List of group expenses

@@ -10,7 +10,7 @@ const CurrencySettings: FC = () => {
     };
 
     return (
-        <div className="bg-gray-900 p-10 rounded-lg shadow-2xl">
+        <div className="m-4 bg-opacity-25 backdrop-blur-md bg-gray-900 p-10 rounded-lg shadow-2xl">
             <h2 className="text-xl font-bold">Currency Settings</h2>
             <div className="mt-4">
                 <label className="block text-sm font-medium text-white-700">Default Currency</label>

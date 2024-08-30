@@ -16,3 +16,15 @@
     display: inline-block;
     white-space: nowrap;
 }
+@keyframes graphLine {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+.animate-graph-line {
+    animation: graphLine 5s linear infinite;
+}

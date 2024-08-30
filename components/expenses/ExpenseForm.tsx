@@ -120,7 +120,7 @@ const ExpenseForm: FC = () => {
 
     return (
         <div>
-            <form onSubmit={handleSubmit} className="bg-gray-900 p-8 rounded-lg shadow-2xl">
+            <form onSubmit={handleSubmit} className="bg-opacity-25 backdrop-blur-md bg-gray-900 p-8 rounded-lg shadow-2xl">
                 <div className="mb-4">
                     <label htmlFor="amount" className="block text-sm font-medium text-white">
                         Amount

@@ -21,7 +21,9 @@ async def get_balance(user_id: str, auth_user_id: str = Depends(authorize_user))
         balance = user_balance["balance"]
         logging.info(f"Balance retrieved for user {user_id}: {balance}")
         return {"user_id": user_id, "balance": balance}
-    
+    except HTTPException as http_exc:
+        # Re-raise the HTTPException to be handled by FastAPI's exception handler
+        raise http_exc
     except Exception as e:
         logging.error(f"Error retrieving balance for user {user_id}: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")

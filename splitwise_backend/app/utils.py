@@ -17,13 +17,19 @@ FIAT_API_KEY = os.getenv("FIAT_EXCHANGE_RATE_API_KEY")
 CRYPTO_API_URL = os.getenv("CRYPTO_EXCHANGE_RATE_API_URL")
 
 def expense_to_json(expense):
-    if "_id" in expense:
+    if "_id" in expense and isinstance(expense["_id"], ObjectId):
         expense["_id"] = str(expense["_id"])
+    if "paid_by" in expense:
+        expense["paid_by"] = {k: v for k, v in expense["paid_by"].items()}
+    if "split_between" in expense:
+        expense["split_between"] = {k: v for k, v in expense["split_between"].items()}
     return expense
 
 def group_to_json(group):
-    if "_id" in group:
+    if "_id" in group and isinstance(group["_id"], ObjectId):
         group["_id"] = str(group["_id"])
+    if "expenses" in group:
+        group["expenses"] = [expense_to_json(expense) for expense in group["expenses"]]
     return group
 
 # Example conversion rates (these would be dynamic in a real-world application)
