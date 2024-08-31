@@ -3,6 +3,7 @@ import { FC, useState } from 'react';
 import axios from 'axios';
 import Button from './Button';
 import * as Dialog from '@radix-ui/react-dialog';
+import AlertDialog from './AlertDialog';
 
 interface ExpenseCardProps {
     groupId: string;
@@ -21,6 +22,10 @@ const ExpenseCard: FC<ExpenseCardProps> = ({ groupId, onClose, onSuccess }) => {
     const [splitUser, setSplitUser] = useState<string>('');
     const [splitAmount, setSplitAmount] = useState<number>(0);
 
+    const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+    const [dialogMessage, setDialogMessage] = useState<string>('');
+    const [alertType, setAlertType] = useState<'success' | 'error'>('success');
+
     const token = localStorage.getItem('token');
 
     const handleAddPaidByUser = () => {
@@ -29,7 +34,9 @@ const ExpenseCard: FC<ExpenseCardProps> = ({ groupId, onClose, onSuccess }) => {
             setPaidByUser('');
             setPaidByAmount(0);
         } else {
-            alert('Please enter a valid user and amount for payment.');
+            setDialogMessage('Please enter a valid user and amount for payment.');
+            setAlertType('error');
+            setIsDialogOpen(true);
         }
     };
 
@@ -39,7 +46,9 @@ const ExpenseCard: FC<ExpenseCardProps> = ({ groupId, onClose, onSuccess }) => {
             setSplitUser('');
             setSplitAmount(0);
         } else {
-            alert('Please enter a valid user and amount for splitting.');
+            setDialogMessage('Please enter a valid user and amount for splitting.');
+            setAlertType('error');
+            setIsDialogOpen(true);
         }
     };
 
@@ -61,21 +70,29 @@ const ExpenseCard: FC<ExpenseCardProps> = ({ groupId, onClose, onSuccess }) => {
             });
 
             if (response.status === 200) {
-                alert('Expense added successfully');
+                setDialogMessage('Expense added successfully');
+                setAlertType('success');
+                setIsDialogOpen(true);
                 onSuccess();
-                onClose();
             }
         } catch (error) {
             console.error('Error adding expense:', error);
-            alert('Failed to add expense. Please try again.');
+            setDialogMessage('Failed to add expense. Please try again.');
+            setAlertType('error');
+            setIsDialogOpen(true);
         }
+    };
+
+    const handleDialogClose = () => {
+        setIsDialogOpen(false);
+        onClose(); // Call onClose only after the dialog is closed
     };
 
     return (
         <Dialog.Root open onOpenChange={onClose}>
-            <Dialog.Overlay className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur" />
-            <Dialog.Content className="fixed inset-0 flex items-center justify-center p-4">
-                <div className="bg-gray-900 p-6 rounded-lg shadow-lg w-full max-w-lg"> {/* Adjusted width and max-width */}
+            <Dialog.Overlay className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur animate-fade-in" />
+            <Dialog.Content className="fixed inset-0 flex items-center justify-center p-4 animate-fade-in-up">
+                <div className="bg-gray-900 p-6 rounded-lg shadow-lg w-full max-w-lg">
                     <Dialog.Title className="text-lg font-bold flex justify-between items-center">
                         Add Expense
                         <button onClick={onClose} className="text-white text-xl">×</button>
@@ -173,6 +190,12 @@ const ExpenseCard: FC<ExpenseCardProps> = ({ groupId, onClose, onSuccess }) => {
                     </form>
                 </div>
             </Dialog.Content>
+            <AlertDialog
+                isOpen={isDialogOpen}
+                onClose={handleDialogClose} // Only close the ExpenseCard after the dialog is closed
+                message={dialogMessage}
+                alertType={alertType}
+            />
         </Dialog.Root>
     );
 };

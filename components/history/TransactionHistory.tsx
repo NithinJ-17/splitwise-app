@@ -77,8 +77,7 @@ const TransactionHistory: FC = () => {
     );
 
     return (
-        <div className="bg-gray-900 bg-opacity-50 backdrop-blur-md p-8 rounded-lg shadow-2xl">
-            <h2 className="text-xl font-bold">Transaction History</h2>
+        <div className="bg-gray-900 bg-opacity-50 backdrop-blur-md p-8 rounded-lg shadow-2xl animate-fade-in-up transition-all duration-500 ease-in-out">
 
             <input
                 type="text"
@@ -92,7 +91,7 @@ const TransactionHistory: FC = () => {
                 {isLoading ? 'Loading...' : 'Get Records'}
             </Button>
 
-            <ScrollArea.Root style={{ height: '500px', marginTop: '1rem' }}>
+            <ScrollArea.Root className="animate-fade-in mt-4" style={{ height: '500px' }}>
                 <ScrollArea.Viewport className="w-full h-full rounded overflow-auto">
                     <Table.Root className="flex justify-center item-center w-full">
                         <Table.Header>
@@ -112,7 +111,7 @@ const TransactionHistory: FC = () => {
                         <Table.Body>
                             {filteredTransactions.length > 0 ? (
                                 filteredTransactions.slice(0, 100).map((transaction) => (
-                                    <Table.Row key={transaction.id} className="hover:bg-gray-800">
+                                    <Table.Row key={transaction.id} className="hover:bg-gray-800 transition-colors duration-300">
                                         <Table.RowHeaderCell className="px-6 py-3 border-b border-gray-700">{transaction.description}</Table.RowHeaderCell>
                                         <Table.Cell className="px-6 py-3 border-b border-gray-700">{transaction.amount ? transaction.amount.toFixed(2) : 'N/A'}</Table.Cell>
                                         <Table.Cell className="px-6 py-3 border-b border-gray-700">{transaction.currency}</Table.Cell>

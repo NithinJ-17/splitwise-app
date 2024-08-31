@@ -2,7 +2,7 @@
 import { FC, useState } from 'react';
 import Button from '../Button';
 import axios from 'axios';
-import * as Dialog from '@radix-ui/react-dialog';
+import AlertDialog from '../AlertDialog';
 
 const ExpenseForm: FC = () => {
     const [amount, setAmount] = useState<number | undefined>(undefined);
@@ -17,10 +17,12 @@ const ExpenseForm: FC = () => {
     const [paidByEmails, setPaidByEmails] = useState<string[]>([]);
     const [splitEmails, setSplitEmails] = useState<string[]>([]);
 
+    const [isLoading, setIsLoading] = useState(false);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [dialogMessage, setDialogMessage] = useState('');
+    const [alertType, setAlertType] = useState<'success' | 'error'>('error'); // Add state for alertType
 
-    const token = localStorage.getItem('token'); // Assuming the token is stored in localStorage
+    const token = localStorage.getItem('token');
 
     const fetchUserIdByEmail = async (email: string): Promise<string | null> => {
         try {
@@ -44,10 +46,14 @@ const ExpenseForm: FC = () => {
                 setPaidByUser('');
                 setPaidByAmount(undefined);
             } else {
-                alert('Failed to fetch user ID. Please check the email.');
+                setDialogMessage('Failed to fetch user ID. Please check the email.');
+                setIsDialogOpen(true);
+                setAlertType('error');
             }
         } else {
-            alert('Please enter a valid registered email and amount for Paid By.');
+            setDialogMessage('Please enter a valid registered email and amount for Paid By.');
+            setIsDialogOpen(true);
+            setAlertType('error');
         }
     };
 
@@ -63,28 +69,39 @@ const ExpenseForm: FC = () => {
                 setSplitUser('');
                 setSplitAmount(undefined);
             } else {
-                alert('Failed to fetch user ID. Please check the email.');
+                setDialogMessage('Failed to fetch user ID. Please check the email.');
+                setIsDialogOpen(true);
+                setAlertType('error');
             }
         } else {
-            alert('Please enter a valid registered email and amount for Split Between.');
+            setDialogMessage('Please enter a valid registered email and amount for Split Between.');
+            setIsDialogOpen(true);
+            setAlertType('error');
         }
     };
 
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
+        setIsLoading(true);
 
         if (!amount || !description || !currency || Object.keys(paidBy).length === 0 || Object.keys(splitBetween).length === 0) {
-            alert('Please fill in all fields and add at least one user for Paid By and Split Between.');
+            setDialogMessage('Please fill in all fields and add at least one user for Paid By and Split Between.');
+            setIsDialogOpen(true);
+            setAlertType('error');
+            setIsLoading(false);
             return;
         }
 
         if (currency.length !== 3) {
-            alert('Currency code must be exactly 3 characters.');
+            setDialogMessage('Currency code must be exactly 3 characters.');
+            setIsDialogOpen(true);
+            setAlertType('error');
+            setIsLoading(false);
             return;
         }
 
         const expenseData = {
-            expense_id: `exp${Math.random().toString(36).substring(2, 9)}`, // Example to generate a random ID
+            expense_id: `exp${Math.random().toString(36).substring(2, 9)}`,
             description,
             amount,
             currency,
@@ -92,7 +109,7 @@ const ExpenseForm: FC = () => {
             split_between: splitBetween,
         };
 
-        console.log('Request packet:', expenseData); // For testing
+        console.log('Request packet:', expenseData);
 
         try {
             const response = await axios.post('http://localhost:8000/create_expenses', expenseData, {
@@ -102,6 +119,7 @@ const ExpenseForm: FC = () => {
             if (response.status === 200) {
                 setDialogMessage('Expense created successfully');
                 setIsDialogOpen(true);
+                setAlertType('success');
                 // Reset form fields after successful submission
                 setAmount(undefined);
                 setDescription('');
@@ -111,16 +129,27 @@ const ExpenseForm: FC = () => {
                 setPaidByEmails([]);
                 setSplitEmails([]);
             }
-        } catch (error) {
-            console.error('Error creating expense:', error);
-            setDialogMessage('Failed to create expense. Please try again.');
+        } catch (error: unknown) {  // Type error as unknown
+            // Check if error is an AxiosError
+            if (axios.isAxiosError(error)) {
+                const errorMessage = error.response?.data?.detail || 'Failed to create expense. Please try again.';
+                setDialogMessage(errorMessage);
+            } else {
+                setDialogMessage('An unexpected error occurred. Please try again.');
+            }
             setIsDialogOpen(true);
+            setAlertType('error');
+        } finally {
+            setIsLoading(false);
         }
     };
 
     return (
-        <div>
-            <form onSubmit={handleSubmit} className="bg-opacity-25 backdrop-blur-md bg-gray-900 p-8 rounded-lg shadow-2xl">
+        <div className="relative">
+            <form
+                onSubmit={handleSubmit}
+                className="bg-opacity-25 backdrop-blur-md bg-gray-900 p-8 rounded-lg shadow-2xl animate-fade-in"
+            >
                 <div className="mb-4">
                     <label htmlFor="amount" className="block text-sm font-medium text-white">
                         Amount
@@ -130,7 +159,7 @@ const ExpenseForm: FC = () => {
                         id="amount"
                         value={amount === undefined ? '' : amount}
                         onChange={(e) => setAmount(Number(e.target.value))}
-                        className="bg-gray-900 mt-1 block w-full p-2 border border-gray-300 rounded-md"
+                        className="bg-gray-900 mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 transition-all duration-300"
                         placeholder="Enter the amount"
                         required
                     />
@@ -144,7 +173,7 @@ const ExpenseForm: FC = () => {
                         id="description"
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
-                        className="bg-gray-900 mt-1 block w-full p-2 border border-gray-300 rounded-md"
+                        className="bg-gray-900 mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 transition-all duration-300"
                         placeholder="Enter a description"
                         required
                     />
@@ -157,8 +186,8 @@ const ExpenseForm: FC = () => {
                         type="text"
                         id="currency"
                         value={currency}
-                        onChange={(e) => setCurrency(e.target.value.toUpperCase())}  // Ensure uppercase
-                        className="bg-gray-900 mt-1 block w-full p-2 border border-gray-300 rounded-md"
+                        onChange={(e) => setCurrency(e.target.value.toUpperCase())}
+                        className="bg-gray-900 mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 transition-all duration-300"
                         maxLength={3}
                         placeholder="Enter currency code (e.g., BTC)"
                         required
@@ -176,14 +205,14 @@ const ExpenseForm: FC = () => {
                             placeholder="Enter registered email"
                             value={paidByUser}
                             onChange={(e) => setPaidByUser(e.target.value)}
-                            className="bg-gray-900 mt-1 block w-full p-2 border border-gray-300 rounded-md"
+                            className="bg-gray-900 mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 transition-all duration-300"
                         />
                         <input
                             type="number"
                             placeholder="Enter amount"
                             value={paidByAmount === undefined ? '' : paidByAmount}
                             onChange={(e) => setPaidByAmount(Number(e.target.value))}
-                            className="bg-gray-900 mt-1 block w-full p-2 border border-gray-300 rounded-md"
+                            className="bg-gray-900 mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 transition-all duration-300"
                         />
                         <Button type="button" onClick={handleAddPaidBy}>
                             Add
@@ -209,14 +238,14 @@ const ExpenseForm: FC = () => {
                             placeholder="Enter registered email"
                             value={splitUser}
                             onChange={(e) => setSplitUser(e.target.value)}
-                            className="bg-gray-900 mt-1 block w-full p-2 border border-gray-300 rounded-md"
+                            className="bg-gray-900 mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 transition-all duration-300"
                         />
                         <input
                             type="number"
                             placeholder="Enter amount"
                             value={splitAmount === undefined ? '' : splitAmount}
                             onChange={(e) => setSplitAmount(Number(e.target.value))}
-                            className="bg-gray-900 mt-1 block w-full p-2 border border-gray-300 rounded-md"
+                            className="bg-gray-900 mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 transition-all duration-300"
                         />
                         <Button type="button" onClick={handleAddUserSplit}>
                             Add
@@ -232,25 +261,24 @@ const ExpenseForm: FC = () => {
                 </div>
 
                 <Button type="submit">
-                    Add Expense
+                    {isLoading ? (
+                        <span className="flex items-center space-x-2">
+                            <span className="spinner-border animate-spin inline-block w-4 h-4 border-2 border-t-transparent border-white rounded-full"></span>
+                            <span>Processing...</span>
+                        </span>
+                    ) : (
+                        'Add Expense'
+                    )}
                 </Button>
             </form>
 
-            {/* Dialog for success or failure notification */}
-            <Dialog.Root open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <Dialog.Overlay className="fixed inset-0 bg-black bg-opacity-50" />
-                <Dialog.Content className="fixed inset-0 flex items-center justify-center p-4">
-                    <div className="bg-black p-6 rounded-lg shadow-lg">
-                        <Dialog.Title className="text-lg font-bold">Notification</Dialog.Title>
-                        <Dialog.Description className="mt-2">
-                            {dialogMessage}
-                        </Dialog.Description>
-                        <div className="mt-4 flex justify-end">
-                            <Button onClick={() => setIsDialogOpen(false)}>Close</Button>
-                        </div>
-                    </div>
-                </Dialog.Content>
-            </Dialog.Root>
+            {/* Use AlertDialog for success or failure notification */}
+            <AlertDialog
+                isOpen={isDialogOpen}
+                onClose={() => setIsDialogOpen(false)}
+                message={dialogMessage}
+                alertType={alertType} // Pass the alertType state
+            />
         </div>
     );
 };

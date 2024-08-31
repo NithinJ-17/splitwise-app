@@ -160,6 +160,11 @@ async def get_user_groups(email: str, x_token: str = Header(...), auth_user_id: 
 @router.post("/groups/{group_id}/add_expense")
 async def add_group_expense(group_id: str, expense: GroupExpense, user_id: str = Depends(authorize_user)):
     try:
+        # Validate that 'paid_by' and 'split_between' are not empty
+        if not expense.paid_by or not expense.split_between:
+            logging.warning("Invalid expense creation attempt: 'paid_by' or 'split_between' fields are empty.")
+            raise HTTPException(status_code=400, detail="'paid_by' and 'split_between' fields cannot be empty")
+
         # Map emails to user_ids in 'paid_by' and 'split_between'
         async def map_emails_to_user_ids(email_dict):
             user_ids_dict = {}

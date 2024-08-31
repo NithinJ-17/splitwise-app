@@ -7,6 +7,7 @@ import * as ScrollArea from '@radix-ui/react-scroll-area';
 import { Table } from '@radix-ui/themes';
 import ProtectedRoute from '../../components/ProtectedRoute';
 import ExpenseCard from '../../components/ExpenseCard';
+import AlertDialog from '../../components/AlertDialog'; // Import the AlertDialog component
 
 interface Group {
     group_id: string;
@@ -37,6 +38,7 @@ const GroupPage = () => {
     const [isExpenseCardOpen, setIsExpenseCardOpen] = useState<boolean>(false);
     const [dialogMessage, setDialogMessage] = useState<string>('');
     const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+    const [alertType, setAlertType] = useState<'success' | 'error'>('error');
 
     const token = localStorage.getItem('token');
     const userEmail = JSON.parse(localStorage.getItem('user') || '{}').email;
@@ -46,6 +48,7 @@ const GroupPage = () => {
     }, []);
 
     const fetchGroups = async () => {
+        setIsLoading(true);
         try {
             const response = await axios.get(`http://127.0.0.1:8000/user/groups?email=${userEmail}`, {
                 headers: { 'x-token': token },
@@ -62,16 +65,34 @@ const GroupPage = () => {
             setGroups(groups);
         } catch (error) {
             console.error('Error fetching groups:', error);
-            alert('Failed to fetch groups. Please try again.');
+    
+            // Type guard to check if error is an AxiosError
+            if (axios.isAxiosError(error)) {
+                if (error.response && error.response.status === 400) {
+                    setDialogMessage(error.response.data.detail || 'A 400 error occurred. Please check the details.');
+                } else {
+                    setDialogMessage('Failed to fetch groups. Please try again.');
+                }
+            } else {
+                setDialogMessage('An unexpected error occurred. Please try again later.');
+            }
+    
+            setAlertType('error');
+            setIsDialogOpen(true);
+        } finally {
+            setIsLoading(false);
         }
     };
-
+    
     const createGroup = async () => {
         if (!newGroupName || newGroupMembers.length === 0) {
-            alert('Please provide a group name and at least one member.');
+            setDialogMessage('Please provide a group name and at least one member.');
+            setAlertType('error');
+            setIsDialogOpen(true);
             return;
         }
-
+    
+        setIsLoading(true);
         try {
             const response = await axios.post(`http://127.0.0.1:8000/groups`, {
                 group_id: `group_${Math.random().toString(36).substring(2, 9)}`, // Generate a unique group ID
@@ -80,8 +101,9 @@ const GroupPage = () => {
             }, {
                 headers: { 'x-token': token },
             });
-
-            setDialogMessage(response.data.message);
+    
+            setDialogMessage(response.data.message || 'Group created successfully');
+            setAlertType('success');
             setIsDialogOpen(true);
             fetchGroups(); // Refresh the group list after creation
             setNewGroupName('');
@@ -89,11 +111,25 @@ const GroupPage = () => {
             setIsCreateGroupOpen(false); // Hide the dialog after successful creation
         } catch (error) {
             console.error('Error creating group:', error);
-            setDialogMessage('Failed to create group. Please try again.');
+    
+            // Type guard to check if error is an AxiosError
+            if (axios.isAxiosError(error)) {
+                if (error.response && error.response.status === 400) {
+                    setDialogMessage(error.response.data.detail || 'A 400 error occurred. Please check the details.');
+                } else {
+                    setDialogMessage('Failed to create group. Please try again.');
+                }
+            } else {
+                setDialogMessage('An unexpected error occurred. Please try again later.');
+            }
+    
+            setAlertType('error');
             setIsDialogOpen(true);
+        } finally {
+            setIsLoading(false);
         }
     };
-
+    
     return (
         <ProtectedRoute>
             <div className="flex flex-col md:flex-row gap-4">
@@ -186,8 +222,8 @@ const GroupPage = () => {
 
                 {/* Create Group Dialog */}
                 <Dialog.Root open={isCreateGroupOpen} onOpenChange={setIsCreateGroupOpen}>
-                    <Dialog.Overlay className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur z-40" />
-                    <Dialog.Content className="fixed inset-0 flex items-center justify-center p-4 z-50">
+                    <Dialog.Overlay className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur z-40 animate-fade-in" />
+                    <Dialog.Content className="fixed inset-0 flex items-center justify-center p-4 z-50 animate-fade-in-up">
                         <div className="bg-gray-900 p-6 rounded-lg shadow-lg w-full max-w-md">
                             <Dialog.Title className="text-lg font-bold flex justify-between items-center">
                                 Create Group
@@ -209,7 +245,7 @@ const GroupPage = () => {
                                     className="bg-gray-900 mt-1 mb-3 block w-full p-2 border border-gray-300 rounded-md"
                                 />
                                 <Button onClick={createGroup}>
-                                    Create Group
+                                    {isLoading ? 'Creating...' : 'Create Group'}
                                 </Button>
                             </div>
                         </div>
@@ -224,20 +260,12 @@ const GroupPage = () => {
                     />
                 )}
 
-                <Dialog.Root open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                    <Dialog.Overlay className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur z-40" />
-                    <Dialog.Content className="fixed inset-0 flex items-center justify-center p-4 z-50">
-                        <div className="bg-gray-900 p-6 rounded-lg shadow-lg w-full max-w-md">
-                            <Dialog.Title className="text-lg font-bold">Notification</Dialog.Title>
-                            <div className="mt-4">
-                                <p className="text-white">{dialogMessage}</p>
-                                <Button onClick={() => setIsDialogOpen(false)}>
-                                    Close
-                                </Button>
-                            </div>
-                        </div>
-                    </Dialog.Content>
-                </Dialog.Root>
+                <AlertDialog 
+                    isOpen={isDialogOpen} 
+                    onClose={() => setIsDialogOpen(false)} 
+                    message={dialogMessage} 
+                    alertType={alertType}
+                />
             </div>
         </ProtectedRoute>
     );
