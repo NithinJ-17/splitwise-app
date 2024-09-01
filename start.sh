@@ -1,7 +1,13 @@
 #!/bin/bash
 
 # Start the FastAPI backend
-/app/splitwise_env/bin/uvicorn backend.app.main:app --host 0.0.0.0 --port 8000 &
+cd /app/backend
+
+source /app/backend/splitwise_env/bin/activate
+
+python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8000 &
+
+cd /app
 
 # Start the Next.js frontend
 npm start --prefix /app/frontend

@@ -30,14 +30,14 @@ RUN python3 -m venv /app/splitwise_env
 
 # Activate the virtual environment and install dependencies
 ENV PATH="/app/splitwise_env/bin:$PATH"
-COPY splitwise_backend/requirements.txt /app/backend/
-RUN pip install --no-cache-dir -r /app/backend/requirements.txt
+COPY splitwise_backend/requirements.txt /app/
+RUN pip install --no-cache-dir -r /app/requirements.txt
 
 # Copy the backend code into the working directory
-COPY splitwise_backend /app/backend
+COPY splitwise_backend /app
 
 # Step 3: Combine both frontend and backend into a single image
-FROM python:3.10-slim
+FROM nikolaik/python-nodejs:python3.10-nodejs18
 
 WORKDIR /app
 
@@ -48,25 +48,24 @@ RUN apt-get update && apt-get install -y nodejs npm
 COPY --from=backend /app /app/backend
 
 # Copy the frontend build files
-COPY --from=frontend /app/.next /app/frontend/.next
-COPY --from=frontend /app/public /app/frontend/public
+COPY --from=frontend /app /app/frontend/
 
 # Recreate and activate the virtual environment for the final image
-RUN python3 -m venv /app/splitwise_env
-ENV PATH="/app/splitwise_env/bin:$PATH"
+RUN python3 -m venv /app/backend/splitwise_env
+ENV PATH="/app/backend/splitwise_env/bin:$PATH"
 
 # Install backend dependencies again (if necessary)
-COPY splitwise_backend/requirements.txt /app/backend/
+COPY splitwise_backend /app/backend/
 RUN pip install --no-cache-dir -r /app/backend/requirements.txt
 
 # Set environment variables for the application
-ENV NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
-ENV MONGO_URL=mongodb+srv://nj17official:<password>@njofficial-prod-cluster.q0dlp.mongodb.net/?retryWrites=true&w=majority&appName=njofficial-prod-cluster
-ENV ALLOWED_ORIGINS=http://localhost:3000
-ENV FIAT_EXCHANGE_RATE_API_URL=https://v6.exchangerate-api.com/v6/7917b245e5e774f2e8d211e6/latest/USD
-ENV FIAT_EXCHANGE_RATE_API_KEY=7917b245e5e774f2e8d211e6
-ENV CRYPTO_EXCHANGE_RATE_API_URL=http://api.coinlayer.com/live?access_key=b645631b1583e9f5caaec5124ee3b6c1
-ENV CRYPTO_EXCHANGE_RATE_API_KEY=b645631b1583e9f5caaec5124ee3b6c1
+ENV NEXT_PUBLIC_API_BASE_URL='http://localhost:8000'
+ENV MONGO_URL='mongodb+srv://nj17official:Vjrocks8101@njofficial-prod-cluster.q0dlp.mongodb.net/?retryWrites=true&w=majority&appName=njofficial-prod-cluster'
+ENV ALLOWED_ORIGINS='https://www.njofficial.com,http://frontend:3000,http://localhost:3000,http://localhost:8000'
+ENV FIAT_EXCHANGE_RATE_API_URL='https://v6.exchangerate-api.com/v6/7917b245e5e774f2e8d211e6/latest/USD'
+ENV FIAT_EXCHANGE_RATE_API_KEY='7917b245e5e774f2e8d211e6'
+ENV CRYPTO_EXCHANGE_RATE_API_URL='http://api.coinlayer.com/live?access_key=b645631b1583e9f5caaec5124ee3b6c1'
+ENV CRYPTO_EXCHANGE_RATE_API_KEY='b645631b1583e9f5caaec5124ee3b6c1'
 
 # Expose ports for frontend and backend
 EXPOSE 3000 8000
