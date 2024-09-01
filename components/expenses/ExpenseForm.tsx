@@ -26,7 +26,7 @@ const ExpenseForm: FC = () => {
 
     const fetchUserIdByEmail = async (email: string): Promise<string | null> => {
         try {
-            const response = await axios.get(`http://127.0.0.1:8000/user_id_by_email?email=${email}`);
+            const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/user_id_by_email?email=${email}`);
             return response.data.user_id;
         } catch (error) {
             console.error('Error fetching user ID:', error);

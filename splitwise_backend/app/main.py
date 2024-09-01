@@ -6,6 +6,7 @@ from app.database.connection import db
 from app.utils import verify_password, hash_password
 from app.state import TOKENS
 from fastapi.middleware.cors import CORSMiddleware
+import os
 
 # Configure logging
 logging.basicConfig(
@@ -17,10 +18,12 @@ logging.basicConfig(
     ]
 )
 
+allowed_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000").split(',')
+
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # Adjust this to your frontend URL
+    allow_origins=allowed_origins,  # Adjust this to your frontend URL
     allow_credentials=True,
     allow_methods=["*"],  # Allow all methods (GET, POST, etc.)
     allow_headers=["*"],  # Allow all headers

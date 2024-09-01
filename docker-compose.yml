@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: app/Dockerfile
+    ports:
+      - "3000:3000"
+    networks:
+      - app-network
+
+  backend:
+    build:
+      context: ./splitwise_backend
+      dockerfile: Dockerfile
+    env_file:
+      - ./splitwise_backend/.env.production
+    ports:
+      - "8000:8000"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

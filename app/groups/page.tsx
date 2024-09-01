@@ -50,7 +50,7 @@ const GroupPage = () => {
     const fetchGroups = async () => {
         setIsLoading(true);
         try {
-            const response = await axios.get(`http://127.0.0.1:8000/user/groups?email=${userEmail}`, {
+            const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/user/groups?email=${userEmail}`, {
                 headers: { 'x-token': token },
             });
     
@@ -94,7 +94,7 @@ const GroupPage = () => {
     
         setIsLoading(true);
         try {
-            const response = await axios.post(`http://127.0.0.1:8000/groups`, {
+            const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/groups`, {
                 group_id: `group_${Math.random().toString(36).substring(2, 9)}`, // Generate a unique group ID
                 name: newGroupName,
                 members: newGroupMembers,
