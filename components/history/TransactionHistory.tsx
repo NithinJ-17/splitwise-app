@@ -4,6 +4,7 @@ import Button from '../Button';
 import axios from 'axios';
 import * as ScrollArea from '@radix-ui/react-scroll-area';
 import { Table } from '@radix-ui/themes';
+import AlertDialog from '../AlertDialog'; // Import the AlertDialog component
 
 interface Transaction {
     id: string;
@@ -22,6 +23,8 @@ const TransactionHistory: FC = () => {
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [filter, setFilter] = useState<string>('');
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+    const [dialogMessage, setDialogMessage] = useState<string>('');
 
     const token = localStorage.getItem('token');
     const userEmail = JSON.parse(localStorage.getItem('user') || '{}').email;
@@ -40,7 +43,8 @@ const TransactionHistory: FC = () => {
         setIsLoading(true);
         const userId = await fetchUserId(userEmail);
         if (!userId) {
-            alert('Failed to fetch user ID.');
+            setDialogMessage('Failed to fetch user ID.');
+            setIsDialogOpen(true);
             setIsLoading(false);
             return;
         }
@@ -50,23 +54,31 @@ const TransactionHistory: FC = () => {
                 headers: { 'x-token': token },
             });
 
-            const expenses = response.data.expenses.map((expense: any) => ({
-                id: expense.expense_id,
-                description: expense.description,
-                amount: expense.amount,
-                currency: expense.currency,
-                date: expense.date,
-                paid_by: expense.paid_by,
-                split_between: expense.split_between,
-                group_id: expense.group_id,
-                initial_currency: expense.initial_currency,
-                initial_amount: expense.initial_amount,
-            }));
+            if (response.data.message === "No expenses found for this user") {
+                const noexpense = "No expenses made by the User"
+                setDialogMessage(noexpense);
+                setIsDialogOpen(true);
+                setTransactions([]); // Clear transactions to show empty state
+            } else {
+                const expenses = response.data.expenses.map((expense: any) => ({
+                    id: expense.expense_id,
+                    description: expense.description,
+                    amount: expense.amount,
+                    currency: expense.currency,
+                    date: expense.date,
+                    paid_by: expense.paid_by,
+                    split_between: expense.split_between,
+                    group_id: expense.group_id,
+                    initial_currency: expense.initial_currency,
+                    initial_amount: expense.initial_amount,
+                }));
 
-            setTransactions(expenses);
+                setTransactions(expenses);
+            }
         } catch (error) {
             console.error('Error fetching transactions:', error);
-            alert('Failed to fetch transactions. Please try again.');
+            setDialogMessage('Failed to fetch transactions. Please try again.');
+            setIsDialogOpen(true);
         } finally {
             setIsLoading(false);
         }
@@ -156,6 +168,12 @@ const TransactionHistory: FC = () => {
                     <ScrollArea.Thumb className="bg-gray-400 rounded-full" />
                 </ScrollArea.Scrollbar>
             </ScrollArea.Root>
+
+            <AlertDialog
+                isOpen={isDialogOpen}
+                onClose={() => setIsDialogOpen(false)}
+                message={dialogMessage}
+            />
         </div>
     );
 };

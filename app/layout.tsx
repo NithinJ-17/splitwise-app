@@ -69,7 +69,7 @@ const LayoutComponent = ({ children }: LayoutProps) => {
                     <CurrencySlideshow />
                     <p className="text-gray-400">© 2024 SplitXchange. All rights reserved. Contact: nj17official@gmail.com. Author: Nithin J</p>
                 </footer>
-                <style jsx>{`
+                <style>{`
                     @keyframes slideBackground {
                         0% {
                             background-position: 0 0;

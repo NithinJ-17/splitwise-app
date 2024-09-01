@@ -18,7 +18,10 @@ logging.basicConfig(
     ]
 )
 
-allowed_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000").split(',')
+# Example of logging an event
+
+
+allowed_origins = os.getenv("ALLOWED_ORIGINS", "").split(",")
 
 app = FastAPI()
 app.add_middleware(

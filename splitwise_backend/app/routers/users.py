@@ -34,12 +34,25 @@ async def signup(user: UserSignup):
             "email": user.email,
             "password": hashed_password
         }
+        
+        # Insert the new user into the users collection
         await db.users.insert_one(new_user)
         logging.info(f"New user {user_id} created successfully with email {user.email}.")
+        
+        # Create a balance record for the new user with an initial balance of 0
+        initial_balance = {
+            "user_id": user_id,
+            "balance": 0.0
+        }
+        await db.balances.insert_one(initial_balance)
+        logging.info(f"Initial balance record created for user {user_id} with balance 0.0.")
+
         return {"message": "User created successfully"}
+    
     except HTTPException as http_exc:
         # Re-raise the HTTPException to be handled by FastAPI's exception handler
         raise http_exc
+    
     except Exception as e:
         logging.error(f"Error during signup for user with email {user.email}: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")

@@ -7,6 +7,8 @@ services:
       dockerfile: app/Dockerfile
     ports:
       - "3000:3000"
+    env_file:
+      - ./.env.development  # This line ensures the frontend uses the development environment variables
     networks:
       - app-network
 
@@ -15,7 +17,7 @@ services:
       context: ./splitwise_backend
       dockerfile: Dockerfile
     env_file:
-      - ./splitwise_backend/.env.production
+      - ./splitwise_backend/.env
     ports:
       - "8000:8000"
     networks:
