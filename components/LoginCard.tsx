@@ -164,7 +164,7 @@ const LoginCard = ({ onClose }: LoginCardProps) => {
                                     required
                                 />
                             </div>
-                            <Button type="submit" className="animate-bounce-in">Sign Up</Button>
+                            <Button type="submit">Sign Up</Button>
                         </form>
                     </Tabs.Content>
                 </Tabs.Root>
