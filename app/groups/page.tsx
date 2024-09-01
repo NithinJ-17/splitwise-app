@@ -40,12 +40,8 @@ const GroupPage = () => {
     const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
     const [alertType, setAlertType] = useState<'success' | 'error'>('error');
 
-    const token = localStorage.getItem('token');
-    const userEmail = JSON.parse(localStorage.getItem('user') || '{}').email;
-
-    useEffect(() => {
-        fetchGroups();
-    }, []);
+    const token = typeof window !== "undefined" ? localStorage.getItem('token') : null;
+    const userEmail = typeof window !== "undefined" ? JSON.parse(localStorage.getItem('user') || '{}').email : null;
 
     const fetchGroups = async () => {
         setIsLoading(true);
@@ -53,41 +49,44 @@ const GroupPage = () => {
             const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/user/groups?email=${userEmail}`, {
                 headers: { 'x-token': token },
             });
-    
+
             if (response.data.detail === "Group not found") {
-                // Set groups to an empty array to reflect no groups found
                 setGroups([]);
             } else {
                 const groups = response.data.groups.map((group: any) => ({
                     ...group,
                     expenses: group.expenses.map((expense: any) => ({
                         ...expense,
-                        amount: Number(expense.amount), // Ensure amount is a number
+                        amount: Number(expense.amount),
                     })),
                 }));
-    
+
                 setGroups(groups);
             }
         } catch (error) {
             console.error("Error fetching groups:", error);
-    
-            // Type guard to check if error is an AxiosError
+
             if (axios.isAxiosError(error)) {
-                // Skip showing dialog for 404 or "Group not found" error
                 if (error.response && error.response.status === 404 && error.response.data.detail === "Group not found") {
-                    setGroups([]); // Clear groups to show empty state
+                    setGroups([]);
                 } else {
                     setDialogMessage(error.response?.data?.detail || "Failed to fetch groups. Please try again.");
                     setAlertType("error");
                     setIsDialogOpen(true);
                 }
-            } 
+            }
         } finally {
             setIsLoading(false);
         }
     };
-    
-    
+
+    useEffect(() => {
+        if (userEmail) {
+            fetchGroups();
+        }
+    }, [userEmail]);
+
+    // Define the createGroup function before using it in JSX
     const createGroup = async () => {
         if (!newGroupName || newGroupMembers.length === 0) {
             setDialogMessage('Please provide a group name and at least one member.');
@@ -95,28 +94,27 @@ const GroupPage = () => {
             setIsDialogOpen(true);
             return;
         }
-    
+
         setIsLoading(true);
         try {
             const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/groups`, {
-                group_id: `group_${Math.random().toString(36).substring(2, 9)}`, // Generate a unique group ID
+                group_id: `group_${Math.random().toString(36).substring(2, 9)}`,
                 name: newGroupName,
                 members: newGroupMembers,
             }, {
                 headers: { 'x-token': token },
             });
-    
+
             setDialogMessage(response.data.message || 'Group created successfully');
             setAlertType('success');
             setIsDialogOpen(true);
             fetchGroups(); // Refresh the group list after creation
             setNewGroupName('');
             setNewGroupMembers([]);
-            setIsCreateGroupOpen(false); // Hide the dialog after successful creation
+            setIsCreateGroupOpen(false);
         } catch (error) {
             console.error('Error creating group:', error);
-    
-            // Type guard to check if error is an AxiosError
+
             if (axios.isAxiosError(error)) {
                 if (error.response && error.response.status === 400) {
                     setDialogMessage(error.response.data.detail || 'A 400 error occurred. Please check the details.');
@@ -126,44 +124,42 @@ const GroupPage = () => {
             } else {
                 setDialogMessage('An unexpected error occurred. Please try again later.');
             }
-    
+
             setAlertType('error');
             setIsDialogOpen(true);
         } finally {
             setIsLoading(false);
         }
     };
-    
+
     return (
         <ProtectedRoute>
             <div className="flex flex-col md:flex-row gap-4">
-                {/* Group List and Create Group Dialog */}
                 <div className="bg-opacity-50 backdrop-blur-md bg-gray-900 p-8 rounded-lg shadow-2xl w-1/4 min-w-[200px]">
-    <h2 className="text-xl font-bold mb-4">Group List</h2>
-    <Button onClick={() => setIsCreateGroupOpen(true)} className='px-10 mt-2 py-2 text-sm font-medium text-white bg-black rounded shadow-lg border border-gray-300 hover:bg-gray-700 hover:shadow-xl transition-all duration-300 ease-in-out'>
-        Create New Group +
-    </Button>
-    <ul className="space-y-2 mt-4 shadow-lg">
-        {groups.length > 0 ? (
-            groups.map(group => (
-                <li key={group.group_id}>
-                    <Button
-                        onClick={() => setSelectedGroup(group)}
-                    >
-                        {group.name}
+                    <h2 className="text-xl font-bold mb-4">Group List</h2>
+                    <Button onClick={() => setIsCreateGroupOpen(true)} className='px-10 mt-2 py-2 text-sm font-medium text-white bg-black rounded shadow-lg border border-gray-300 hover:bg-gray-700 hover:shadow-xl transition-all duration-300 ease-in-out'>
+                        Create New Group +
                     </Button>
-                </li>
-            ))
-        ) : (
-            <li>
-                <div className="text-gray-500 text-center p-4 border border-gray-300 rounded shadow-inner">
-                    No groups found. Create a new group to get started!
+                    <ul className="space-y-2 mt-4 shadow-lg">
+                        {groups.length > 0 ? (
+                            groups.map(group => (
+                                <li key={group.group_id}>
+                                    <Button
+                                        onClick={() => setSelectedGroup(group)}
+                                    >
+                                        {group.name}
+                                    </Button>
+                                </li>
+                            ))
+                        ) : (
+                            <li>
+                                <div className="text-gray-500 text-center p-4 border border-gray-300 rounded shadow-inner">
+                                    No groups found. Create a new group to get started!
+                                </div>
+                            </li>
+                        )}
+                    </ul>
                 </div>
-            </li>
-        )}
-    </ul>
-</div>
-
 
                 {/* Group Details */}
                 {selectedGroup && (

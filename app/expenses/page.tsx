@@ -7,8 +7,8 @@ import CheckBalance from '../../components/expenses/CheckBalance';
 
 const ExpensesPage = () => {
     const [userId, setUserId] = useState<string | null>(null);
-    const token = localStorage.getItem('token');
-    const userEmail = JSON.parse(localStorage.getItem('user') || '{}').email;
+    const [token, setToken] = useState<string | null>(null);
+    const [userEmail, setUserEmail] = useState<string | null>(null);
 
     const fetchUserId = async (email: string): Promise<string | null> => {
         try {
@@ -21,12 +21,21 @@ const ExpensesPage = () => {
     };
 
     useEffect(() => {
-        const getUserId = async () => {
-            const id = await fetchUserId(userEmail);
-            setUserId(id);
-        };
-        getUserId();
-    }, [userEmail]);
+        if (typeof window !== "undefined") {
+            const token = localStorage.getItem('token');
+            const userEmail = JSON.parse(localStorage.getItem('user') || '{}').email;
+            setToken(token);
+            setUserEmail(userEmail);
+
+            const getUserId = async () => {
+                if (userEmail) {
+                    const id = await fetchUserId(userEmail);
+                    setUserId(id);
+                }
+            };
+            getUserId();
+        }
+    }, []);
 
     return (
         <ProtectedRoute>

@@ -1,6 +1,7 @@
 import * as React from 'react';
 import * as Popover from '@radix-ui/react-popover';
 import { useRouter } from 'next/navigation'; // Adjust based on your directory structure
+import Image from 'next/image';
 import Button from './Button';
 
 interface UserPopoverProps {
@@ -26,10 +27,12 @@ const UserPopover: React.FC<UserPopoverProps> = ({ userName, userEmail, onLogout
                     href="#"
                     aria-label="User menu"
                 >
-                    <img
+                    <Image
                         className="block h-[45px] w-[45px] rounded-full"
                         src="https://pbs.twimg.com/profile_images/1337055608613253126/r_eiMp2H_400x400.png"
                         alt="User Avatar"
+                        width={45}
+                        height={45}
                     />
                 </a>
             </Popover.Trigger>
@@ -40,10 +43,12 @@ const UserPopover: React.FC<UserPopoverProps> = ({ userName, userEmail, onLogout
                     align="end"
                 >
                     <div className="flex flex-col items-center gap-[7px]">
-                        <img
+                        <Image
                             className="block h-[60px] w-[60px] rounded-full"
                             src="https://pbs.twimg.com/profile_images/1337055608613253126/r_eiMp2H_400x400.png"
                             alt="User Avatar"
+                            width={60}
+                            height={60}
                         />
                         <div className="flex flex-col gap-[15px] text-center">
                             <div>

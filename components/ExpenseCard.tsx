@@ -26,7 +26,7 @@ const ExpenseCard: FC<ExpenseCardProps> = ({ groupId, onClose, onSuccess }) => {
     const [dialogMessage, setDialogMessage] = useState<string>('');
     const [alertType, setAlertType] = useState<'success' | 'error'>('success');
 
-    const token = localStorage.getItem('token');
+    const token = typeof window !== "undefined" ? localStorage.getItem('token') : null;
 
     const handleAddPaidByUser = () => {
         if (paidByUser && paidByAmount > 0) {

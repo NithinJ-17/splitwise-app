@@ -26,8 +26,8 @@ const TransactionHistory: FC = () => {
     const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
     const [dialogMessage, setDialogMessage] = useState<string>('');
 
-    const token = localStorage.getItem('token');
-    const userEmail = JSON.parse(localStorage.getItem('user') || '{}').email;
+    const token = typeof window !== "undefined" ? localStorage.getItem('token') : null;
+    const userEmail = typeof window !== "undefined" ? JSON.parse(localStorage.getItem('user') || '{}').email : null;
 
     const fetchUserId = async (email: string): Promise<string | null> => {
         try {

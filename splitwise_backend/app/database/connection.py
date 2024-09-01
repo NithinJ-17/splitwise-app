@@ -11,7 +11,5 @@ class Settings(BaseModel):
 
 settings = Settings()
 
-print("MONGO URL: " + settings.mongo_url)
-
 client = AsyncIOMotorClient(settings.mongo_url)
 db = client.splitwise

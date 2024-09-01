@@ -15,14 +15,15 @@ const Header: FC = () => {
     const [user, setUser] = useState<{ email: string } | null>(null);
 
     useEffect(() => {
-        // Load user from localStorage if authenticated
-        if (isAuthenticated) {
+        // Check if running in the browser
+        if (typeof window !== 'undefined' && isAuthenticated) {
             const storedUser = localStorage.getItem('user');
             if (storedUser) {
                 setUser(JSON.parse(storedUser)); // Store the user object from localStorage
             }
         }
     }, [isAuthenticated]);
+    
 
     const handleLogout = () => {
         dispatch(logout());

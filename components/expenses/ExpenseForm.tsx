@@ -22,7 +22,7 @@ const ExpenseForm: FC = () => {
     const [dialogMessage, setDialogMessage] = useState('');
     const [alertType, setAlertType] = useState<'success' | 'error'>('error'); // Add state for alertType
 
-    const token = localStorage.getItem('token');
+    const token = typeof window !== "undefined" ? localStorage.getItem('token') : null;
 
     const fetchUserIdByEmail = async (email: string): Promise<string | null> => {
         try {

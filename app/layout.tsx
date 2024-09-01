@@ -1,7 +1,7 @@
 "use client";
 
 import '../styles/globals.css';
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState, useCallback } from 'react';
 import Header from '../components/Header';
 import CurrencySlideshow from '../components/CurrencySlideshow';
 import { Provider, useDispatch, useSelector } from 'react-redux';
@@ -30,7 +30,7 @@ const LayoutComponent = ({ children }: LayoutProps) => {
     }, [dispatch, isAuthenticated, pathname, router]);
 
     // Function to select background image based on the route
-    const selectBackgroundImage = () => {
+    const selectBackgroundImage = useCallback(() => {
         if (pathname === '/') {
             return '/images/bitcoin_dig.jpg';
         }
@@ -42,14 +42,14 @@ const LayoutComponent = ({ children }: LayoutProps) => {
             '/images/rupee.jpg',
         ];
         return images[Math.floor(Math.random() * images.length)];
-    };
+    }, [pathname]);
 
     // Preload background image to ensure it displays correctly
     useEffect(() => {
         const img = new Image();
         img.src = selectBackgroundImage();
         img.onload = () => setBgImageLoaded(true);
-    }, [pathname]);
+    }, [selectBackgroundImage]);
 
     return (
         <html lang="en">
