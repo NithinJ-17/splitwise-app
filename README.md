@@ -8,6 +8,8 @@ Here’s the final version of the README section with the provided URLs included
 
 SplitXchange is a sophisticated, next-generation expense-sharing application designed to cater to the needs of a global audience. It seamlessly handles the complexities of splitting expenses across multiple users and currencies, including both fiat and cryptocurrencies. SplitXchange empowers users with robust features such as flexible expense splitting, secure group management, and advanced authentication, making it a comprehensive solution for both personal and group financial management on a global scale.
 
+Link : https://spotless-homburg-122.notion.site/SplitXchange-Simplified-Splits-Universal-Exchange-6b40789cc69c454595129143ba107cbe
+
 ### **📂 Code Submission**
 
 - **Repository:** [GitHub Link or ZIP File]
@@ -108,9 +110,10 @@ For a comprehensive list of API endpoints, along with example requests and respo
 
 [SplitXchange API Documentation](https://documenter.getpostman.com/view/36755637/2sAXjM3reZ)
 
-### **📚 Conclusion**
+### **📚 Conclusion&Thesis**
 
 SplitXchange sets a new standard in expense-sharing applications by combining the flexibility of multiple currency support, including cryptocurrencies, with robust group management and secure user authentication. This project is not just a financial tool but a comprehensive platform designed to meet the needs of a global, interconnected audience. The detailed API documentation and meticulously structured data models ensure that SplitXchange is both scalable and adaptable, ready to handle the financial complexities of the modern world.
+Link : https://spotless-homburg-122.notion.site/SplitXchange-Simplified-Splits-Universal-Exchange-6b40789cc69c454595129143ba107cbe
 
 ---
 
