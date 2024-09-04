@@ -77,4 +77,4 @@ COPY start.sh /app/start.sh
 RUN chmod +x /app/start.sh
 
 # Start both frontend and backend using the start script
-CMD ["/app/start.sh"]
+CMD ["/bin/bash", "/app/start.sh"]
